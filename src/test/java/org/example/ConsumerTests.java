@@ -2,17 +2,13 @@ package org.example;
 
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.example.helpers.KafkaModule;
-import org.example.helpers.KafkaProperties;
-import org.example.helpers.KafkaPropertiesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.testng.asserts.SoftAssert;
 
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,41 +19,53 @@ public class ConsumerTests extends BaseConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(ConsumerTests.class.getSimpleName());
 
+    private List<String> recordsFromPoll;
+
+    private ConsumerRecords<String, String> records;
+
+    private KafkaConsumer<String, String> consumer;
+
+    @BeforeMethod
+    void create_KafkaConsumer() {
+        consumer = utils.getKafkaConsumer();
+    }
+
     @Test
-    void test_KafkaConsumer() {
-        logger.info("Starting Kafka Consumer test");
-        KafkaProperties properties = KafkaPropertiesFactory.getKafkaProperties(String.valueOf(KafkaModule.CONSUMER));
-        consumer = new KafkaConsumer<>(properties.getProperties());
+    void test_KafkaConsumerReadsMessageFromLatestOffset() {
+        logger.info("************Starting test_KafkaConsumerReadsStringMessageFromLatestOffset************");
+
+        //subscribe to 1 topic
         consumer.subscribe(Collections.singleton(prop.getProperty("TOPIC_NAME")));
 
+        logger.info("************polling**************");
+        records = utils.pollingKafkaTopic(prop.getProperty("POLL_TIMEOUT"), prop.getProperty("TOPIC_NAME"));
 
-        List<String> recordsFromPoll = new ArrayList<>();
+        recordsFromPoll = utils.getOffsetDataFromTopic(records);
+        Assert.assertEquals(recordsFromPoll.get(0).trim(), "abc");
+        //logger.info("Kafka message read!" + recordsFromPoll);
+    }
 
-        ConsumerRecords<String, String> records;
-
-        //while (true) {
-            logger.info("polling");
-            records = consumer.poll(Duration.ofMillis(1000));
-            logger.info("polling after consumer");
-
-            records.forEach(s -> {
-                logger.info("key, value, partition, offset " + s.key() + " "
-                        + s.value() + " " + s.partition() + " " + s.offset());
-
-                recordsFromPoll.add(s.value());
-            });
-            //break;
-
-        //}
-
-        logger.info("Kafka message read!" + recordsFromPoll);
-
-        //Assert.assertSame(recordsFromPoll.get(0).trim(), "Hye Kafka");
+    @AfterMethod
+    void tearDown() {
+        consumer.close();
     }
 }
 
+
+
+/*logger.info("key, value, partition, offset " + s.key() + " "
+        + s.value() + " " + s.partition() + " " + s.offset());*/
+
 //TODO
-//1. reading from last offset
+//1. reading from last offset ----- done
+
+//replicate
+//1. read till offset x and commit
+//2. consumer down
+//3. publish new message
+//4. consumer up and start reading
+
+
 //2. assuming 1 partition
 //Consumer groups reading
 //reading from offset

@@ -2,9 +2,9 @@ package org.example;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.example.helpers.KafkaModule;
-import org.example.helpers.KafkaProperties;
-import org.example.helpers.KafkaPropertiesFactory;
+import org.example.helpers.kafkaPropertiesGenerator.KafkaModule;
+import org.example.helpers.kafkaPropertiesGenerator.KafkaProperties;
+import org.example.helpers.kafkaPropertiesGenerator.KafkaPropertiesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;

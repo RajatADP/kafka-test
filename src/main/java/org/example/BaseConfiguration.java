@@ -1,7 +1,7 @@
 package org.example;
 
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.example.helpers.utils.Utils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,7 +12,9 @@ public class BaseConfiguration {
     public static Properties prop;
     public KafkaProducer<String, String> producer;
 
-    public KafkaConsumer<String, String> consumer;
+    public Utils utils = new Utils();
+
+
 
     static {
         try {
@@ -38,6 +40,5 @@ public class BaseConfiguration {
         }
         return prop;
     }
-
 }
 
