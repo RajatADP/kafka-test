@@ -1,10 +1,11 @@
-package org.example.helpers.kafkaPropertiesGenerator;
+package org.ubs.helpers.kafkaPropertiesGenerator;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.example.BaseConfiguration;
+import org.ubs.base.BaseConfiguration;
 
 import java.util.Properties;
+import java.util.UUID;
 
 public class KafkaConsumerProperties implements KafkaProperties {
 
@@ -17,6 +18,7 @@ public class KafkaConsumerProperties implements KafkaProperties {
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, configuration.prop.getProperty("GROUP_ID_CONFIG"));
+        properties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, configuration.prop.getProperty("MAX_POLL_INTERVAL_MS"));
 
         return properties;
     }

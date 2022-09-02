@@ -1,14 +1,19 @@
 package org.example;
 
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.ubs.base.BaseConfiguration;
+import org.ubs.model.ConsumerData;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,16 +26,40 @@ public class ConsumerTests extends BaseConfiguration {
 
     private List<String> recordsFromPoll;
 
-    private ConsumerRecords<String, String> records;
-
-    private KafkaConsumer<String, String> consumer;
+    private ConsumerData consumerData;
 
     @BeforeMethod
-    void create_KafkaConsumer() {
+    void create_KafkaConsumer() throws IOException {
         consumer = utils.getKafkaConsumer();
+
+
     }
 
-    @Test
+    //@Test(priority = 1)
+    void test_readFromConsumer() {
+
+        logger.info("************polling**************");
+
+        TopicPartition partitionToReadFrom = new TopicPartition(prop.getProperty("TOPIC_NAME"), 0);
+
+        consumer.assign(Collections.singleton(partitionToReadFrom));
+
+
+        consumer.seek(partitionToReadFrom, 37);
+
+
+
+
+        utils.pollingKafkaTopic(prop.getProperty("POLL_TIMEOUT"), prop.getProperty("TOPIC_NAME"));
+
+
+
+    }
+
+
+
+
+    //@Test
     void test_KafkaConsumerReadsMessageFromLatestOffset() {
         logger.info("************Starting test_KafkaConsumerReadsStringMessageFromLatestOffset************");
 
@@ -38,11 +67,14 @@ public class ConsumerTests extends BaseConfiguration {
         consumer.subscribe(Collections.singleton(prop.getProperty("TOPIC_NAME")));
 
         logger.info("************polling**************");
-        records = utils.pollingKafkaTopic(prop.getProperty("POLL_TIMEOUT"), prop.getProperty("TOPIC_NAME"));
+        utils.pollingKafkaTopic(prop.getProperty("POLL_TIMEOUT"), prop.getProperty("TOPIC_NAME"));
 
-        recordsFromPoll = utils.getOffsetDataFromTopic(records);
-        Assert.assertEquals(recordsFromPoll.get(0).trim(), "abc");
-        //logger.info("Kafka message read!" + recordsFromPoll);
+        recordsFromPoll = utils.getOffsetDataFromTopic();
+
+        consumerData = utils.convertJsonStringToObject(recordsFromPoll.get(0).trim());
+
+        Assert.assertEquals(consumerData.getName(), "demo_111");
+        logger.info("Kafka message read!" + recordsFromPoll);
     }
 
     @AfterMethod
@@ -51,21 +83,14 @@ public class ConsumerTests extends BaseConfiguration {
     }
 }
 
-
-
-/*logger.info("key, value, partition, offset " + s.key() + " "
-        + s.value() + " " + s.partition() + " " + s.offset());*/
-
 //TODO
 //1. reading from last offset ----- done
-
-//replicate
-//1. read till offset x and commit
-//2. consumer down
-//3. publish new message
-//4. consumer up and start reading
+//2. send and receive json payload from topic
 
 
-//2. assuming 1 partition
-//Consumer groups reading
-//reading from offset
+//dockerFile
+//docker-compose.yml
+//integrate some UI before running consumer test which will producer message in topic
+//jenkins
+//test case integrate in azure (explore)
+//

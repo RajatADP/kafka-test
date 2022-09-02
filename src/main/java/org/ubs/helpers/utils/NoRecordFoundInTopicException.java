@@ -1,4 +1,4 @@
-package org.example.helpers.utils;
+package org.ubs.helpers.utils;
 
 public class NoRecordFoundInTopicException extends RuntimeException {
 

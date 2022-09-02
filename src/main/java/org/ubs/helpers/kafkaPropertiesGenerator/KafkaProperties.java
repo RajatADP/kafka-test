@@ -1,4 +1,4 @@
-package org.example.helpers.kafkaPropertiesGenerator;
+package org.ubs.helpers.kafkaPropertiesGenerator;
 
 import java.util.Properties;
 

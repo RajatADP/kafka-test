@@ -1,4 +1,4 @@
-package org.example.helpers.kafkaPropertiesGenerator;
+package org.ubs.helpers.kafkaPropertiesGenerator;
 
 public enum KafkaModule {
     PRODUCER, CONSUMER;

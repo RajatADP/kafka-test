@@ -1,7 +1,8 @@
-package org.example;
+package org.ubs.base;
 
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.example.helpers.utils.Utils;
+import org.ubs.helpers.utils.Utils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,9 +13,11 @@ public class BaseConfiguration {
     public static Properties prop;
     public KafkaProducer<String, String> producer;
 
+    public KafkaConsumer<String, String> consumer;
+
     public Utils utils = new Utils();
 
-
+    public int partition = 0;
 
     static {
         try {

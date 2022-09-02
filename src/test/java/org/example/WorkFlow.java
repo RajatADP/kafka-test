@@ -3,35 +3,37 @@ package org.example;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.ubs.base.BaseConfiguration;
 import org.ubs.helpers.kafkaPropertiesGenerator.KafkaModule;
 import org.ubs.helpers.kafkaPropertiesGenerator.KafkaProperties;
 import org.ubs.helpers.kafkaPropertiesGenerator.KafkaPropertiesFactory;
+import org.ubs.model.ConsumerData;
 import org.ubs.model.ProducerData;
 
-/**
- * Hello world!
- */
-public class ProducerTests extends BaseConfiguration {
+import java.util.Collections;
+import java.util.List;
 
-    private static final Logger logger = LoggerFactory.getLogger(ProducerTests.class.getSimpleName());
+public class WorkFlow extends BaseConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(WorkFlow.class.getSimpleName());
+    private List<String> recordsFromPoll;
+    private ConsumerData consumerData;
     private ProducerData producerData;
 
-    @BeforeMethod
-    void setUp() {
-        producerData = new ProducerData(11, "demo21_21"); //list
+    private static int partitionValue = 0;
+
+    void setUpProducerData() {
+        producerData = new ProducerData(11, "demo3");
     }
 
-    @Test
-    void test_KafkaProducer() {
-
-        //setUp();
+    @Test(priority = 1)
+    void test_SendMessageFromProducer() {
+        setUpProducerData();
 
         logger.info("Starting Kafka Producer test");
         KafkaProperties properties = KafkaPropertiesFactory.getKafkaProperties(String.valueOf(KafkaModule.PRODUCER));
@@ -48,13 +50,32 @@ public class ProducerTests extends BaseConfiguration {
                 logger.error("message not sent with error - " + e.getMessage());
         });
         logger.info("Kafka message sent!");
-
-        tearDown();
+        tearDownProducer();
     }
 
-//    @AfterMethod
-    private void tearDown() {
+    private void tearDownProducer() {
         producer.flush();
         producer.close();
     }
+
+    @Test(priority = 2)
+    void test_readFromConsumer() {
+        logger.info("************polling**************");
+        consumer = utils.getKafkaConsumer();
+        TopicPartition partitionToReadFrom = new TopicPartition(prop.getProperty("TOPIC_NAME"), partitionValue);
+        consumer.assign(Collections.singleton(partitionToReadFrom));
+
+        long pos = consumer.position(partitionToReadFrom);
+        if (pos >= 10)
+            consumer.seek(partitionToReadFrom, pos - 10);
+
+        utils.pollingKafkaTopic(prop.getProperty("POLL_TIMEOUT"), prop.getProperty("TOPIC_NAME"));
+        recordsFromPoll = utils.getOffsetDataFromTopic();
+        consumerData = utils.convertJsonStringToObject(recordsFromPoll.get(0).trim());
+
+        Assert.assertEquals(consumerData.getName(), "demo3");
+        logger.info("Kafka message read!" + recordsFromPoll);
+    }
 }
+
+

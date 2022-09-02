@@ -1,8 +1,8 @@
-package org.example.helpers.kafkaPropertiesGenerator;
+package org.ubs.helpers.kafkaPropertiesGenerator;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.example.BaseConfiguration;
+import org.ubs.base.BaseConfiguration;
 
 import java.util.Properties;
 
