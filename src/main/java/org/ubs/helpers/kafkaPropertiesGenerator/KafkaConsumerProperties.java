@@ -5,7 +5,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.ubs.base.BaseConfiguration;
 
 import java.util.Properties;
-import java.util.UUID;
 
 public class KafkaConsumerProperties implements KafkaProperties {
 
@@ -14,7 +13,7 @@ public class KafkaConsumerProperties implements KafkaProperties {
         Properties properties = new Properties();
         BaseConfiguration configuration = new BaseConfiguration();
 
-        properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, configuration.prop.getProperty("BOOTSTRAP_SERVERS_CONFIG"));
+        properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, configuration.prop.getProperty("BOOTSTRAP_SERVERS_CONFIG_DOCKER"));
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, configuration.prop.getProperty("GROUP_ID_CONFIG"));

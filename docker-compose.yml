@@ -1,0 +1,5 @@
+services:
+  kafka-test:
+    build:
+      context: .
+      dockerfile: Dockerfile

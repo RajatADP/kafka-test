@@ -1,4 +1,4 @@
-package org.example;
+package org.ubs;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -66,8 +66,10 @@ public class WorkFlow extends BaseConfiguration {
         consumer.assign(Collections.singleton(partitionToReadFrom));
 
         long pos = consumer.position(partitionToReadFrom);
-        if (pos >= 10)
+        if (pos > 10)
             consumer.seek(partitionToReadFrom, pos - 10);
+        else
+            consumer.seekToBeginning(Collections.singleton(partitionToReadFrom));
 
         utils.pollingKafkaTopic(prop.getProperty("POLL_TIMEOUT"), prop.getProperty("TOPIC_NAME"));
         recordsFromPoll = utils.getOffsetDataFromTopic();
